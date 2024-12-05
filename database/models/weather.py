@@ -12,3 +12,4 @@ class WeatherData(Base):
     temperature = Column(Float, nullable=False)
     humidity = Column(Float, nullable=False)
     timestamp = Column(DateTime, nullable=False)
+    wind_speed = Column(Float, nullable=True)
