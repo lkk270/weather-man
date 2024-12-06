@@ -29,9 +29,11 @@ jobs:
 
       - name: Create deployment package
         run: |
-          pip install -r requirements.txt -t ./package
+          mkdir package
+          pip install --platform manylinux2014_x86_64 --target ./package --implementation cp --python-version 3.9 --only-binary=:all: --upgrade -r requirements.txt
+          rm -rf package/*.dist-info package/*.pth
           cp -r core database providers main.py ./package/
-          cd package && zip -r ../deployment_package.zip .
+          cd package && zip -r ../deployment_package.zip . -x "*.pyc" "*.pyo" "test*" "tests*" "*__pycache__*"
 
       - name: Terraform Init
         run: |
