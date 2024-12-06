@@ -2,3 +2,9 @@ venv/
 .cache_ggshield
 .env
 commands.txt
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+!*.tfvars.example
