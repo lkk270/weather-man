@@ -5,8 +5,7 @@ provider "aws" {
 
 # Create an IAM role for the Lambda function
 resource "aws_iam_role" "lambda_role" {
-  name = "weather_pipeline_lambda_role_${terraform.workspace}"
-
+  name = "weather-pipeline-lambda-role-${terraform.workspace}"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
