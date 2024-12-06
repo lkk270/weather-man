@@ -27,9 +27,17 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
 
+      - name: Cache pip packages
+        uses: actions/cache@v2
+        with:
+          path: ./package
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
       - name: Create deployment package
         run: |
-          mkdir package
+          mkdir -p package
           pip install --platform manylinux2014_x86_64 --target ./package --implementation cp --python-version 3.9 --only-binary=:all: --upgrade -r requirements.txt
           rm -rf package/*.dist-info package/*.pth
           cp -r core database providers main.py ./package/
