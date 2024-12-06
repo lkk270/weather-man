@@ -47,7 +47,7 @@ resource "aws_lambda_function" "weather_pipeline" {
   environment {
     variables = {
       DATABASE_URL = var.database_url
-      NWS_OBSERVATION_API_TOKEN = var.nws_token
+      NWS_OBSERVATION_API_TOKEN = var.nws_observation_api_token
       ENVIRONMENT = terraform.workspace
     }
   }

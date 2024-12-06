@@ -10,7 +10,7 @@ variable "database_url" {
   sensitive   = true  # This marks the variable as sensitive in logs
 }
 
-variable "nws_token" {
+variable "nws_observation_api_token" {
   description = "NWS Observation API token"
   type        = string
   sensitive   = true
