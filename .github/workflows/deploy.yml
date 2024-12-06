@@ -31,17 +31,21 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ./package
-          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.prod.txt') }}
           restore-keys: |
             ${{ runner.os }}-pip-
 
       - name: Create deployment package
         run: |
           mkdir -p package
-          pip install --platform manylinux2014_x86_64 --target ./package --implementation cp --python-version 3.9 --only-binary=:all: --upgrade -r requirements.txt
+          pip install --platform manylinux2014_x86_64 --target ./package \
+            --implementation cp --python-version 3.9 \
+            --only-binary=:all: --upgrade \
+            -r requirements.prod.txt
           rm -rf package/*.dist-info package/*.pth
           cp -r core database providers main.py ./package/
           cd package && zip -r ../deployment_package.zip . -x "*.pyc" "*.pyo" "test*" "tests*" "*__pycache__*"
+          ls -lh ../deployment_package.zip
 
       - name: Terraform Init
         run: |
