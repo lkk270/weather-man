@@ -55,7 +55,10 @@ jobs:
       - name: Terraform Plan
         run: |
           cd infrastructure
-          terraform plan -var="database_url=${{ secrets.DATABASE_URL }}" -var="nws_observation_api_token=${{ secrets.NWS_OBSERVATION_API_TOKEN }}"
+          terraform plan \
+            -var="database_url=${{ secrets.DATABASE_URL }}" \
+            -var="nws_observation_api_token=${{ secrets.NWS_OBSERVATION_API_TOKEN }}" \
+            -var="alert_email=${{ secrets.ALERT_EMAIL }}"
 
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
