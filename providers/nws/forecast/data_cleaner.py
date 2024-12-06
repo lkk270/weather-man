@@ -1,7 +1,8 @@
 from datetime import datetime, timezone
+from core.settings import LOCATIONS
 
 
-def clean_weather_data(raw_data):
+def clean_forecast_data(raw_data, location_id: str = "NYC"):
     print("Starting data cleaning...")
 
     if not isinstance(raw_data, dict):
@@ -16,6 +17,10 @@ def clean_weather_data(raw_data):
         print("Error: 'periods' not in properties")
         return []
 
+    if location_id not in LOCATIONS:
+        raise ValueError(f"Unknown location: {location_id}")
+
+    location = LOCATIONS[location_id]
     periods = raw_data['properties']['periods']
     print(
         f"Found {len(periods)} total periods, will process up to 24 future hours")
@@ -39,7 +44,7 @@ def clean_weather_data(raw_data):
                 continue
 
             cleaned_record = {
-                "location": "NYC",
+                "location": location_id,
                 "temperature": float(period['temperature']),
                 "relative_humidity": float(period['relativeHumidity']['value']),
                 "wind_speed": float(period['windSpeed'].replace(' mph', '')),

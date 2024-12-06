@@ -4,7 +4,7 @@ from database import SessionLocal
 from database.models import WeatherForecast
 
 
-async def load_weather_data(data):
+async def load_forecast_data(data):
     async with SessionLocal() as session:
         async with session.begin():
             for record in data:

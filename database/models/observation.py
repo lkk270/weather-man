@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Float, DateTime, Boolean, func
+from sqlalchemy import Column, Integer, String, Float, DateTime, text
 from database.models.base import Base
 
 
@@ -12,17 +12,10 @@ class WeatherObservation(Base):
     relative_humidity = Column(Float, nullable=False)
     wind_speed = Column(Float, nullable=True)
     dew_point = Column(Float, nullable=True)
-    is_daytime = Column(Boolean, nullable=False)
-    is_precipitating = Column(Boolean, nullable=False)
-    # When the observation was made
-    observed_for = Column(
-        DateTime,
-        nullable=False,
-        server_default=func.now()
-
-    )
+    short_observation = Column(String, nullable=False)
+    observed_for = Column(DateTime(timezone=True), nullable=False)
     created_at = Column(
-        DateTime,
+        DateTime(timezone=True),
         nullable=False,
-        server_default=func.now()
+        server_default=text('CURRENT_TIMESTAMP AT TIME ZONE \'UTC\'')
     )
