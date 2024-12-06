@@ -101,3 +101,47 @@ resource "aws_cloudwatch_log_group" "lambda_logs" {
     Project     = "weather-man"
   }
 }
+
+# Create SNS Topic for notifications
+resource "aws_sns_topic" "lambda_alerts" {
+  name = "weather-pipeline-alerts-${terraform.workspace}"
+  
+  tags = {
+    Name        = "weather-pipeline-alerts"
+    Environment = terraform.workspace
+    ManagedBy   = "terraform"
+    Project     = "weather-man"
+  }
+}
+
+# Add email subscription
+resource "aws_sns_topic_subscription" "lambda_alerts_email" {
+  topic_arn = aws_sns_topic.lambda_alerts.arn
+  protocol  = "email"
+  endpoint  = var.alert_email  # We'll add this variable
+}
+
+# Add CloudWatch Alarm for Lambda errors
+resource "aws_cloudwatch_metric_alarm" "lambda_errors" {
+  alarm_name          = "weather-pipeline-errors-${terraform.workspace}"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = "1"
+  metric_name         = "Errors"
+  namespace          = "AWS/Lambda"
+  period             = "300"  # 5 minutes
+  statistic          = "Sum"
+  threshold          = "0"
+  alarm_description  = "Monitors Lambda function errors"
+  alarm_actions      = [aws_sns_topic.lambda_alerts.arn]
+  
+  dimensions = {
+    FunctionName = aws_lambda_function.weather_pipeline.function_name
+  }
+
+  tags = {
+    Name        = "weather-pipeline-alarm"
+    Environment = terraform.workspace
+    ManagedBy   = "terraform"
+    Project     = "weather-man"
+  }
+}

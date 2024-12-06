@@ -15,3 +15,8 @@ variable "nws_observation_api_token" {
   type        = string
   sensitive   = true
 }
+
+variable "alert_email" {
+  description = "Email address for Lambda error notifications"
+  type        = string
+}
