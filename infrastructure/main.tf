@@ -1,3 +1,12 @@
+terraform {
+  backend "s3" {
+    bucket         = "weather-man-terraform-state-prod"
+    key            = "terraform.tfstate"
+    region         = "us-east-1"
+    encrypt        = true
+  }
+}
+
 # Configure the AWS Provider
 provider "aws" {
   region = var.aws_region

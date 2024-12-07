@@ -52,6 +52,11 @@ jobs:
           cd infrastructure
           terraform init
 
+      - name: Select Terraform Workspace
+        run: |
+          cd infrastructure
+          terraform workspace select prod
+
       - name: Terraform Plan
         run: |
           cd infrastructure
