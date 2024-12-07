@@ -5,7 +5,7 @@ provider "aws" {
 
 # Create an IAM role for the Lambda function
 resource "aws_iam_role" "lambda_role" {
-  name = "github-weather-man-lambda-role-prod"
+  name_prefix = "github-weather-man-lambda-"
   
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
