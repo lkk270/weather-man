@@ -37,7 +37,7 @@ resource "aws_iam_role_policy_attachment" "lambda_logs" {
 # Create Lambda function
 resource "aws_lambda_function" "weather_pipeline" {
   filename         = "../deployment_package.zip"
-  function_name    = "github-weather-man-lambda-prod"
+  function_name    = "github-weather-man-lambda-${terraform.workspace}"
   role            = aws_iam_role.lambda_role.arn
   handler         = "main.lambda_handler"
   runtime         = "python3.9"
