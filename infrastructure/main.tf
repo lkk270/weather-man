@@ -43,6 +43,8 @@ resource "aws_lambda_function" "weather_pipeline" {
   runtime         = "python3.9"
   timeout         = 300
   memory_size     = 256
+  architectures   = ["x86_64"]
+  package_type    = "Zip"
 
   environment {
     variables = {
@@ -50,6 +52,10 @@ resource "aws_lambda_function" "weather_pipeline" {
       NWS_OBSERVATION_API_TOKEN = var.nws_observation_api_token
       ENVIRONMENT = "prod"
     }
+  }
+
+  ephemeral_storage {
+    size = 512
   }
 
   tags = {
