@@ -40,8 +40,9 @@ jobs:
           mkdir -p package
           pip install --no-cache-dir --platform manylinux2014_x86_64 --target ./package \
             --implementation cp --python-version 3.9 \
-            --only-binary=:all: --upgrade \
+            --only-binary=:all: --upgrade --force-reinstall \
             -r requirements.prod.txt
+          ls -l ./package/requests*  # Verify that requests is installed
           rm -rf package/*.dist-info package/*.pth
           cp -r core database providers main.py ./package/
           cd package && zip -r ../deployment_package.zip . -x "*.pyc" "*.pyo" "test*" "tests*" "*__pycache__*"
