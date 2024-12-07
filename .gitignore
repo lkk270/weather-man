@@ -4,6 +4,7 @@ venv/
 commands.txt
 # Terraform
 .terraform/
+.terraform.lock.hcl
 *.tfstate
 *.tfstate.*
 *.tfvars
