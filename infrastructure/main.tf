@@ -66,12 +66,13 @@ resource "aws_lambda_function" "weather_pipeline" {
   }
 
   lifecycle {
+    prevent_destroy = true
+    create_before_destroy = true
     ignore_changes = [
-      # Ignore changes to tags
       tags,
-      # Don't recreate when deployment package changes
       filename,
       source_code_hash,
+      environment
     ]
   }
 }
