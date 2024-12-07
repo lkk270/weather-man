@@ -1,5 +1,7 @@
 import asyncio
 import logging
+import requests
+import sys
 from datetime import datetime, timezone
 from core.settings import LOCATIONS
 from providers.nws.forecast import (
@@ -83,9 +85,11 @@ def main():
 
 def lambda_handler(event, context):
     """AWS Lambda entry point."""
+    print("sys.path:", sys.path)
+    print("requests version:", requests.__version__)
     logger.info(f"Lambda triggered at {datetime.now(timezone.utc)}")
     logger.info(f"Event data: {event}")
-    
+
     try:
         main()
         return {
