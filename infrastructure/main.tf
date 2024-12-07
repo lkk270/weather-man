@@ -72,6 +72,7 @@ resource "aws_lambda_function" "weather_pipeline" {
     Environment = "prod"
     ManagedBy   = "terraform"
     Project     = "weather-man"
+    ForceUpdate = "2024-12-07" # Unique key to force an update
   }
 }
 
