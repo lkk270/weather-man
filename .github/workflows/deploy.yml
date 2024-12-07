@@ -58,15 +58,17 @@ jobs:
           terraform workspace select prod
 
       - name: Terraform Plan
+        id: terraform_plan
         run: |
           cd infrastructure
-          terraform plan \
+          terraform plan -detailed-exitcode \
             -var="database_url=${{ secrets.DATABASE_URL }}" \
             -var="nws_observation_api_token=${{ secrets.NWS_OBSERVATION_API_TOKEN }}" \
             -var="alert_email=${{ secrets.ALERT_EMAIL }}"
+        continue-on-error: true
 
       - name: Terraform Apply
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        if: steps.terraform_plan.outcome == 'success' && steps.terraform_plan.conclusion == 'success'
         run: |
           cd infrastructure
           terraform apply -auto-approve \

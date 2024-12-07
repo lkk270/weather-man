@@ -77,7 +77,7 @@ resource "aws_lambda_function" "weather_pipeline" {
 
 # Allow EventBridge to invoke Lambda
 resource "aws_lambda_permission" "allow_eventbridge" {
-  statement_id  = "AllowEventBridgeInvoke"
+  statement_id  = "AllowEventBridgeInvoke-${terraform.workspace}"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.weather_pipeline.function_name
   principal     = "events.amazonaws.com"
