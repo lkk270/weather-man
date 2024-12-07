@@ -20,3 +20,8 @@ variable "alert_email" {
   description = "Email address for Lambda error notifications"
   type        = string
 }
+
+variable "force_update_value" {
+  default = ""
+  description = "A dynamic value to trigger a forced update for the Lambda function."
+}
