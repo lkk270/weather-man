@@ -36,7 +36,7 @@ resource "aws_iam_role_policy_attachment" "lambda_logs" {
 # Create Lambda function
 resource "aws_lambda_function" "weather_pipeline" {
   filename         = "../deployment_package.zip"
-  function_name    = "weather_pipeline_${terraform.workspace}"
+  function_name    = "github-weather-man-lambda-prod"
   role            = aws_iam_role.lambda_role.arn
   handler         = "main.lambda_handler"
   runtime         = "python3.9"
@@ -104,7 +104,7 @@ resource "aws_cloudwatch_log_group" "lambda_logs" {
 
 # Create SNS Topic for notifications
 resource "aws_sns_topic" "lambda_alerts" {
-  name = "weather-pipeline-alerts-${terraform.workspace}"
+  name = "github-weather-man-alerts-prod"
   
   tags = {
     Name        = "weather-pipeline-alerts"
