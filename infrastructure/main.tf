@@ -5,7 +5,7 @@ provider "aws" {
 
 # Create an IAM role for the Lambda function
 resource "aws_iam_role" "lambda_role" {
-  name_prefix = "github-weather-man-lambda-"
+  name = "github-weather-man-lambda-role-prod"
   
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -64,17 +64,6 @@ resource "aws_lambda_function" "weather_pipeline" {
     ManagedBy   = "terraform"
     Project     = "weather-man"
   }
-
-  lifecycle {
-    prevent_destroy = true
-    create_before_destroy = true
-    ignore_changes = [
-      tags,
-      filename,
-      source_code_hash,
-      environment
-    ]
-  }
 }
 
 # Allow EventBridge to invoke Lambda
@@ -117,15 +106,6 @@ resource "aws_cloudwatch_log_group" "lambda_logs" {
     Environment = "prod"
     ManagedBy   = "terraform"
     Project     = "weather-man"
-  }
-
-  lifecycle {
-    prevent_destroy = true
-    create_before_destroy = true
-    ignore_changes = [
-      tags,
-      name
-    ]
   }
 }
 
