@@ -43,7 +43,6 @@ resource "aws_lambda_function" "weather_pipeline" {
   runtime         = "python3.9"
   timeout         = 300
   memory_size     = 256
-  replace_triggered_by = [aws_iam_role.lambda_role]
 
   environment {
     variables = {
