@@ -81,5 +81,21 @@ def main():
         raise
 
 
+def lambda_handler(event, context):
+    """AWS Lambda entry point."""
+    logger.info(f"Lambda triggered at {datetime.now(timezone.utc)}")
+    logger.info(f"Event data: {event}")
+    
+    try:
+        main()
+        return {
+            'statusCode': 200,
+            'body': 'Weather pipeline completed successfully'
+        }
+    except Exception as e:
+        logger.error(f"Pipeline failed: {str(e)}")
+        raise
+
+
 if __name__ == "__main__":
     main()
