@@ -64,6 +64,16 @@ resource "aws_lambda_function" "weather_pipeline" {
     ManagedBy   = "terraform"
     Project     = "weather-man"
   }
+
+  lifecycle {
+    ignore_changes = [
+      # Ignore changes to tags
+      tags,
+      # Don't recreate when deployment package changes
+      filename,
+      source_code_hash,
+    ]
+  }
 }
 
 # Allow EventBridge to invoke Lambda
