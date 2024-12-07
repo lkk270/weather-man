@@ -6,6 +6,8 @@ provider "aws" {
 # Create an IAM role for the Lambda function
 resource "aws_iam_role" "lambda_role" {
   name = "github-weather-man-lambda-role-prod"
+  force_destroy = true
+  
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -21,7 +23,7 @@ resource "aws_iam_role" "lambda_role" {
 
   tags = {
     Name        = "weather-pipeline-lambda-role"
-    Environment = terraform.workspace
+    Environment = "prod"
     ManagedBy   = "terraform"
     Project     = "weather-man"
   }
@@ -40,20 +42,21 @@ resource "aws_lambda_function" "weather_pipeline" {
   role            = aws_iam_role.lambda_role.arn
   handler         = "main.lambda_handler"
   runtime         = "python3.9"
-  timeout         = 300  # 5 minutes
-  memory_size     = 256 # MB
+  timeout         = 300
+  memory_size     = 256
+  replace_triggered_by = [aws_iam_role.lambda_role]
 
   environment {
     variables = {
       DATABASE_URL = var.database_url
       NWS_OBSERVATION_API_TOKEN = var.nws_observation_api_token
-      ENVIRONMENT = terraform.workspace
+      ENVIRONMENT = "prod"
     }
   }
 
   tags = {
     Name        = "weather-pipeline"
-    Environment = terraform.workspace
+    Environment = "prod"
     ManagedBy   = "terraform"
     Project     = "weather-man"
   }
