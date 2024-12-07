@@ -108,7 +108,7 @@ resource "aws_cloudwatch_event_target" "weather_pipeline_target" {
 
 # Create CloudWatch Log Group with retention
 resource "aws_cloudwatch_log_group" "lambda_logs" {
-  name              = "/aws/lambda/${aws_lambda_function.weather_pipeline.function_name}"
+  name              = "/aws/lambda/github-weather-man-lambda-prod-new-logs"
   retention_in_days = 14
 
   tags = {
@@ -120,9 +120,9 @@ resource "aws_cloudwatch_log_group" "lambda_logs" {
 
   lifecycle {
     prevent_destroy = false
+    create_before_destroy = true
     ignore_changes = [
-      tags,
-      name
+      tags
     ]
   }
 }
