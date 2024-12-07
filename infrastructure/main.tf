@@ -109,13 +109,21 @@ resource "aws_cloudwatch_event_target" "weather_pipeline_target" {
 # Create CloudWatch Log Group with retention
 resource "aws_cloudwatch_log_group" "lambda_logs" {
   name              = "/aws/lambda/${aws_lambda_function.weather_pipeline.function_name}"
-  retention_in_days = 14  # Adjust retention as needed
+  retention_in_days = 14
 
   tags = {
     Name        = "weather-pipeline-logs"
-    Environment = terraform.workspace
+    Environment = "prod"
     ManagedBy   = "terraform"
     Project     = "weather-man"
+  }
+
+  lifecycle {
+    prevent_destroy = false
+    ignore_changes = [
+      tags,
+      name
+    ]
   }
 }
 
