@@ -65,8 +65,18 @@ jobs:
           terraform plan -detailed-exitcode \
             -var="database_url=${{ secrets.DATABASE_URL }}" \
             -var="nws_observation_api_token=${{ secrets.NWS_OBSERVATION_API_TOKEN }}" \
-            -var="alert_email=${{ secrets.ALERT_EMAIL }}"
-        continue-on-error: false
+            -var="alert_email=${{ secrets.ALERT_EMAIL }}" \
+            -var="force_update_value=$(date '+%Y-%m-%dT%H:%M:%S')" > tf_plan.log 2>&1 || exit_code=$?
+          cat tf_plan.log
+          if [ "$exit_code" -eq 2 ]; then
+            echo "Terraform detected changes."
+            exit 0  # Treat as success
+          elif [ "$exit_code" -ne 0 ]; then
+            echo "Terraform plan failed!" >&2
+            exit $exit_code
+          else
+            echo "No changes detected by Terraform."
+          fi
 
       - name: Terraform Apply
         if: steps.terraform_plan.outcome == 'success' && steps.terraform_plan.conclusion == 'success'
