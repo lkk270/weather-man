@@ -9,7 +9,7 @@ async def load_forecast_data(data):
         return 0
 
     async with SessionLocal() as session:
-        try:
+        async with session.begin():
             # Add all records
             for record in data:
                 forecast = WeatherForecast(
@@ -26,9 +26,4 @@ async def load_forecast_data(data):
                 )
                 session.add(forecast)
 
-            # Commit the transaction
-            await session.commit()
             return len(data)
-        except Exception as e:
-            await session.rollback()
-            raise
