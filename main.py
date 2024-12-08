@@ -96,17 +96,20 @@ def main():
 
 def lambda_handler(event, context):
     """AWS Lambda entry point."""
-    print("sys.path:", sys.path)
-    print("requests version:", requests.__version__)
     logger.info(f"Lambda triggered at {datetime.now(timezone.utc)}")
     logger.info(f"Event data: {event}")
 
+    # Run migrations first, outside of the main try-catch
     try:
-        # Run migrations first
         alembic_cfg = Config("alembic.ini")
         command.upgrade(alembic_cfg, "head")
+        logger.info("Database migrations completed successfully")
+    except Exception as e:
+        logger.error(f"Migration failed: {str(e)}")
+        raise
 
-        # Then run the main process
+    # Then proceed with the main process
+    try:
         main()
         return {
             'statusCode': 200,
