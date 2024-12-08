@@ -2,16 +2,23 @@ from contextlib import asynccontextmanager
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import AsyncGenerator
 from database import SessionLocal
+import logging
 
 
 @asynccontextmanager
 async def get_db_session() -> AsyncGenerator[AsyncSession, None]:
     """Get a database session context manager with transaction."""
+    logger = logging.getLogger(__name__)
     async with SessionLocal() as session:
         async with session.begin():
             try:
                 yield session
+            except Exception as e:
+                logger.error(f"Session error occurred: {str(e)}")
+                logger.error("Stack trace:", exc_info=True)
+                raise
             finally:
+                logger.info("Closing database session")
                 await session.close()
 
 

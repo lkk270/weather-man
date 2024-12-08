@@ -18,6 +18,7 @@ from providers.nws.observation import (
 )
 from alembic import command
 from alembic.config import Config
+from sqlalchemy.exc import SQLAlchemyError
 
 # Configure logging
 logging.basicConfig(
@@ -74,23 +75,41 @@ async def process_all_locations():
         try:
             for location_id in LOCATIONS:
                 logger.info(f"Processing location: {location_id}")
+                try:
+                    # Process forecast
+                    raw_forecast = fetch_forecast_data(location_id)
+                    cleaned_forecast = clean_forecast_data(
+                        raw_forecast, location_id)
+                    try:
+                        await load_forecast_data(cleaned_forecast, session)
+                    except SQLAlchemyError as dbe:
+                        logger.error(
+                            f"Database error loading forecast: {str(dbe)}")
+                        raise
 
-                # Process forecast
-                raw_forecast = fetch_forecast_data(location_id)
-                cleaned_forecast = clean_forecast_data(
-                    raw_forecast, location_id)
-                await load_forecast_data(cleaned_forecast, session)
+                    # Process observation
+                    raw_observation = fetch_observation_data(location_id)
+                    cleaned_observation = clean_observation_data(
+                        raw_observation, location_id)
+                    try:
+                        await load_observation_data(cleaned_observation, session)
+                    except SQLAlchemyError as dbe:
+                        logger.error(
+                            f"Database error loading observation: {str(dbe)}")
+                        raise
 
-                # Process observation
-                raw_observation = fetch_observation_data(location_id)
-                cleaned_observation = clean_observation_data(
-                    raw_observation, location_id)
-                await load_observation_data(cleaned_observation, session)
+                except Exception as e:
+                    logger.error(
+                        f"Error processing location {location_id}: {str(e)}")
+                    raise
 
-                logger.info(f"Completed processing for {location_id}")
-
-            await session.commit()
-            logger.info("Successfully committed all changes to database")
+            logger.info("Attempting to commit all changes...")
+            try:
+                await session.commit()
+                logger.info("Successfully committed all changes to database")
+            except SQLAlchemyError as dbe:
+                logger.error(f"Database error during commit: {str(dbe)}")
+                raise
 
         except Exception as e:
             logger.error(f"Error in process_all_locations: {str(e)}")
