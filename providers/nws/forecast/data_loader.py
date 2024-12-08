@@ -17,40 +17,13 @@ async def load_forecast_data(data, session=None):
 
 async def _load_forecast_data(data, session):
     location = data[0]["location"]
-
-    latest_forecast_query = (
-        select(WeatherForecast.forecast_time)
-        .where(WeatherForecast.location == location)
-        .order_by(desc(WeatherForecast.forecast_time))
-        .limit(1)
-    )
-
-    result = await session.execute(latest_forecast_query)
-    latest_time = result.scalar()
-
-    new_records = []
-    if latest_time:
-        print(f"Latest forecast in DB for {location} was at: {latest_time}")
-        new_records = [
-            record for record in data
-            if record["forecast_time"] > latest_time
-        ]
-    else:
-        print(
-            f"No existing forecasts found for {location}, will load all records")
-        new_records = data
-
-    if not new_records:
-        print("No new forecasts to load")
-        return 0
-
-    print(f"Found {len(new_records)} new forecasts to load for {location}")
+    print(f"Loading {len(data)} new forecasts for {location}")
 
     current_time = datetime.now(timezone.utc)
-    for record in new_records:
+    for record in data:
         record['created_at'] = current_time
         forecast = WeatherForecast(**record)
         session.add(forecast)
 
     await session.flush()
-    return len(new_records)
+    return len(data)
