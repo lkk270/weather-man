@@ -64,12 +64,21 @@ async def process_location_observation(location_id: str):
 
 async def process_all_locations():
     """Process both forecast and observation data for all locations."""
-    tasks = []
-    for location_id in LOCATIONS:
-        tasks.append(process_location_forecast(location_id))
-        tasks.append(process_location_observation(location_id))
+    try:
+        for location_id in LOCATIONS:
+            # Process forecast first
+            logger.info(f"Processing forecast for {location_id}")
+            await process_location_forecast(location_id)
 
-    await asyncio.gather(*tasks)
+            # Then process observation
+            logger.info(f"Processing observation for {location_id}")
+            await process_location_observation(location_id)
+
+            logger.info(f"Completed processing for {location_id}")
+
+    except Exception as e:
+        logger.error(f"Error in process_all_locations: {str(e)}")
+        raise
 
 
 def main():
