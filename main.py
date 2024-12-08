@@ -104,7 +104,7 @@ def main():
         raise
 
 
-async def lambda_handler(event, context):
+def lambda_handler(event, context):
     """AWS Lambda entry point."""
     logger.info(f"Lambda triggered at {datetime.now(timezone.utc)}")
     logger.info(f"Event data: {event}")
@@ -115,8 +115,8 @@ async def lambda_handler(event, context):
         command.upgrade(alembic_cfg, "head")
         logger.info("Database migrations completed successfully")
 
-        # Process locations
-        await process_all_locations()
+        # Process locations using asyncio.run()
+        asyncio.run(process_all_locations())
 
         return {
             'statusCode': 200,
@@ -124,7 +124,10 @@ async def lambda_handler(event, context):
         }
     except Exception as e:
         logger.error(f"Pipeline failed: {str(e)}")
-        raise
+        return {
+            'statusCode': 500,
+            'body': f'Pipeline failed: {str(e)}'
+        }
 
 
 if __name__ == "__main__":
