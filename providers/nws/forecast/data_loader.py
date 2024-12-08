@@ -36,7 +36,8 @@ async def _load_forecast_data(data, session):
             if record["forecast_time"] > latest_time
         ]
     else:
-        print(f"No existing forecasts found for {location}, will load all records")
+        print(
+            f"No existing forecasts found for {location}, will load all records")
         new_records = data
 
     if not new_records:
@@ -49,4 +50,5 @@ async def _load_forecast_data(data, session):
         forecast = WeatherForecast(**record)
         session.add(forecast)
 
+    await session.flush()
     return len(new_records)

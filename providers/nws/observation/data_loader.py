@@ -38,11 +38,9 @@ async def _load_observation_data(data, session):
     result = await session.execute(latest_observation_query)
     latest_time = result.scalar()
 
-    # Filter out any observations that are older than or equal to our latest record
     new_records = []
     if latest_time:
-        print(
-            f"Latest observation in DB for {location} was at: {latest_time}")
+        print(f"Latest observation in DB for {location} was at: {latest_time}")
         new_records = [
             record for record in data
             if record["observed_time"] > latest_time
@@ -56,22 +54,11 @@ async def _load_observation_data(data, session):
         print("No new observations to load")
         return 0
 
-    print(
-        f"Found {len(new_records)} new observations to load for {location}")
+    print(f"Found {len(new_records)} new observations to load for {location}")
 
-    # Add all new records within the same transaction
     for record in new_records:
-        observation = WeatherObservation(
-            location=record["location"],
-            temperature=record["temperature"],
-            my_temperature=record["my_temperature"],
-            relative_humidity=record["relative_humidity"],
-            wind_speed=record["wind_speed"],
-            dew_point=record["dew_point"],
-            short_observation=record["short_observation"],
-            observed_time=record["observed_time"],
-            created_at=func.now()
-        )
+        observation = WeatherObservation(**record)
         session.add(observation)
 
+    await session.flush()
     return len(new_records)
