@@ -9,8 +9,8 @@ async def load_forecast_data(data):
         return 0
 
     async with SessionLocal() as session:
-        async with session.begin():  # This ensures proper transaction management
-            # Add all records within a single transaction
+        try:
+            # Add all records
             for record in data:
                 forecast = WeatherForecast(
                     location=record["location"],
@@ -24,6 +24,10 @@ async def load_forecast_data(data):
                     probability_of_precipitation=record["probability_of_precipitation"]
                 )
                 session.add(forecast)
-            
-            # No need for explicit commit, it's handled by session.begin()
+
+            # Commit the transaction
+            await session.commit()
             return len(data)
+        except Exception as e:
+            await session.rollback()
+            raise
