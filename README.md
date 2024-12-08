@@ -59,7 +59,7 @@ terraform init
 
 ```bash
 mkdir -p package
-pip install -r requirements.txt -t package/
+pip install -r requirements.prod.txt -t package/
 cp -r src/ package/
 zip -r deployment_package.zip package/
 ```
