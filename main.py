@@ -72,50 +72,40 @@ async def process_location_observation(location_id: str):
 async def process_all_locations():
     """Process both forecast and observation data for all locations."""
     async with get_db_session() as session:
-        try:
-            for location_id in LOCATIONS:
-                logger.info(f"Processing location: {location_id}")
-                try:
-                    # Process forecast
-                    raw_forecast = fetch_forecast_data(location_id)
-                    cleaned_forecast = clean_forecast_data(
-                        raw_forecast, location_id)
-                    try:
-                        await load_forecast_data(cleaned_forecast, session)
-                    except SQLAlchemyError as dbe:
-                        logger.error(
-                            f"Database error loading forecast: {str(dbe)}")
-                        raise
-
-                    # Process observation
-                    raw_observation = fetch_observation_data(location_id)
-                    cleaned_observation = clean_observation_data(
-                        raw_observation, location_id)
-                    try:
-                        await load_observation_data(cleaned_observation, session)
-                    except SQLAlchemyError as dbe:
-                        logger.error(
-                            f"Database error loading observation: {str(dbe)}")
-                        raise
-
-                except Exception as e:
-                    logger.error(
-                        f"Error processing location {location_id}: {str(e)}")
-                    raise
-
-            logger.info("Attempting to commit all changes...")
+        failed_locations = []
+        
+        for location_id in LOCATIONS:
+            logger.info(f"Processing location: {location_id}")
             try:
-                await session.commit()
-                logger.info("Successfully committed all changes to database")
-            except SQLAlchemyError as dbe:
-                logger.error(f"Database error during commit: {str(dbe)}")
-                raise
+                # Process forecast
+                raw_forecast = fetch_forecast_data(location_id)
+                cleaned_forecast = clean_forecast_data(raw_forecast, location_id)
+                await load_forecast_data(cleaned_forecast, session)
 
-        except Exception as e:
-            logger.error(f"Error in process_all_locations: {str(e)}")
-            await session.rollback()
-            logger.error("Rolling back all changes due to error")
-            raise
+                # Process observation
+                raw_observation = fetch_observation_data(location_id)
+                cleaned_observation = clean_observation_data(raw_observation, location_id)
+                await load_observation_data(cleaned_observation, session)
+
+                # Commit changes for this location
+                await session.commit()
+                logger.info(f"Successfully processed location: {location_id}")
+                
+            except Exception as e:
+                logger.error(f"Error processing location {location_id}: {str(e)}")
+                logger.error("Stack trace:", exc_info=True)
+                await session.rollback()
+                failed_locations.append(location_id)
+                continue
+
+        if failed_locations:
+            logger.error(f"Failed to process locations: {', '.join(failed_locations)}")
+            return {
+                'success': False,
+                'failed_locations': failed_locations
+            }
+        
+        return {'success': True}
 
 
 def main():
