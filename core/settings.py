@@ -43,6 +43,51 @@ LOCATIONS: Dict[str, LocationConfig] = {
         grid_x=105,
         grid_y=51
     ),
+    "HOU": LocationConfig(
+        name="Houston, Houston Hobby Airport",
+        latitude=29.6375,
+        longitude=-95.2825,
+        station_id="KHOU",
+        grid_id="HGX",
+        grid_x=68,
+        grid_y=91
+    ),
+    "PHL": LocationConfig(
+        name="Philadelphia, Philadelphia International Airport",
+        latitude=39.961978912353516,
+        longitude=-75.14990234375,
+        station_id="KPHL",
+        grid_id="PHI",
+        grid_x=50,
+        grid_y=76
+    ),
+    "MDW": LocationConfig(
+        name="Chicago, Chicago Midway Airport",
+        latitude=41.78417,
+        longitude=-87.75528,
+        station_id="KMDW",
+        grid_id="LOT",
+        grid_x=72,
+        grid_y=69
+    ),
+    "AUS": LocationConfig(
+        name="Austin-Bergstrom International Airport",
+        latitude=30.2,
+        longitude=-97.68,
+        station_id="KAUS",
+        grid_id="EWX",
+        grid_x=158,
+        grid_y=88
+    ),
+    "DEN": LocationConfig(
+        name="Denver, Denver International Airport",
+        latitude=39.84658,
+        longitude=-104.65622,
+        station_id="KDEN",
+        grid_id="BOU",
+        grid_x=75,
+        grid_y=66
+    ),
 }
 
 NWS_FORECAST_BASE_URL = "https://api.weather.gov"
