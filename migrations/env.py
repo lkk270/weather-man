@@ -13,8 +13,7 @@ target_metadata = Base.metadata
 
 
 def clean_database_url(url):
-    # Remove ssl=require and convert to proper format
-    url = url.replace("postgresql+asyncpg://", "postgresql://")
+    # Keep using asyncpg, just remove ssl=require if present
     url = re.sub(r"\?ssl=require", "", url)
     return url
 
