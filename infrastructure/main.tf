@@ -106,7 +106,8 @@ resource "aws_cloudwatch_event_target" "weather_pipeline_target" {
   arn       = aws_lambda_function.weather_pipeline.arn
   
   retry_policy {
-    maximum_retry_attempts = 0  # Disable retries
+    maximum_event_age_in_seconds = 60  # Minimum allowed value
+    maximum_retry_attempts       = 0    # Disable retries
   }
 }
 
