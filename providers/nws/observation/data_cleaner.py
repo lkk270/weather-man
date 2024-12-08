@@ -40,7 +40,7 @@ def clean_observation_data(raw_data, location_id: str = "NYC"):
                 "wind_speed": wind_speeds[i] if wind_speeds[i] is not None else None,
                 "dew_point": float(dew_points[i]),
                 "short_observation": summaries[i],
-                "observed_for": dt,
+                "observed_time": dt,
                 "my_temperature": None  # This will need to be populated from another source
             }
             cleaned_data.append(cleaned_record)

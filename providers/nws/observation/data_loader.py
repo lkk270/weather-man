@@ -9,9 +9,9 @@ async def load_observation_data(data):
         async with session.begin():
             # Get the latest observation time for NYC
             latest_observation_query = (
-                select(WeatherObservation.observed_for)
+                select(WeatherObservation.observed_time)
                 .where(WeatherObservation.location == "NYC")
-                .order_by(desc(WeatherObservation.observed_for))
+                .order_by(desc(WeatherObservation.observed_time))
                 .limit(1)
             )
 
@@ -24,7 +24,7 @@ async def load_observation_data(data):
                 print(f"Latest observation in DB was at: {latest_time}")
                 new_records = [
                     record for record in data
-                    if record["observed_for"] > latest_time
+                    if record["observed_time"] > latest_time
                 ]
             else:
                 print("No existing observations found, will load all records")
@@ -46,7 +46,7 @@ async def load_observation_data(data):
                     wind_speed=record["wind_speed"],
                     dew_point=record["dew_point"],
                     short_observation=record["short_observation"],
-                    observed_for=record["observed_for"],
+                    observed_time=record["observed_time"],
                     created_at=func.now()
                 )
                 session.add(observation)

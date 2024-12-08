@@ -37,8 +37,8 @@ async def compare_forecasts_with_observations():
 
             observations_query = select(WeatherObservation).where(
                 WeatherObservation.location == forecast.location,
-                WeatherObservation.observed_for >= start_time,
-                WeatherObservation.observed_for < end_time
+                WeatherObservation.observed_time >= start_time,
+                WeatherObservation.observed_time < end_time
             )
 
             observations = await session.execute(observations_query)
@@ -59,7 +59,7 @@ async def compare_forecasts_with_observations():
                     print(f"Location: {forecast.location}")
                     print(f"Forecast time: {forecast.forecast_time}")
                     print(
-                        f"Observation time: {matching_observation.observed_for}")
+                        f"Observation time: {matching_observation.observed_time}")
                     print(
                         f"Forecast temp: {forecast.temperature}°F (rounded to {forecast_temp_rounded}°F)")
                     print(

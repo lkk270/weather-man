@@ -13,7 +13,7 @@ class WeatherObservation(Base):
     wind_speed = Column(Float, nullable=True)
     dew_point = Column(Float, nullable=True)
     short_observation = Column(String, nullable=False)
-    observed_for = Column(DateTime(timezone=True), nullable=False)
+    observed_time = Column(DateTime(timezone=True), nullable=False)
     created_at = Column(
         DateTime(timezone=True),
         nullable=False,
