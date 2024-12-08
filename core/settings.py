@@ -25,24 +25,24 @@ LOCATIONS: Dict[str, LocationConfig] = {
         grid_x=34,          # NWS grid coordinates
         grid_y=38
     ),
-    "NYC_CASTLE_2": LocationConfig(
-        name="New York City",
-        latitude=40.7816,
-        longitude=-73.9505,
-        station_id="KNYC",  # Central Park station
-        grid_id="OKX",      # NWS grid ID for NYC
-        grid_x=35,          # NWS grid coordinates
-        grid_y=38
-    ),
-    "MIA": LocationConfig(
-        name="Miami, Miami International Airport",
-        latitude=25.79056,
-        longitude=-80.31639,
-        station_id="KMIA",
-        grid_id="MFL",
-        grid_x=105,
-        grid_y=51
-    ),
+    # "NYC_CASTLE_2": LocationConfig(
+    #     name="New York City",
+    #     latitude=40.7816,
+    #     longitude=-73.9505,
+    #     station_id="KNYC",  # Central Park station
+    #     grid_id="OKX",      # NWS grid ID for NYC
+    #     grid_x=35,          # NWS grid coordinates
+    #     grid_y=38
+    # ),
+    # "MIA": LocationConfig(
+    #     name="Miami, Miami International Airport",
+    #     latitude=25.79056,
+    #     longitude=-80.31639,
+    #     station_id="KMIA",
+    #     grid_id="MFL",
+    #     grid_x=105,
+    #     grid_y=51
+    # ),
 }
 
 NWS_FORECAST_BASE_URL = "https://api.weather.gov"
