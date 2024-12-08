@@ -37,7 +37,8 @@ async def process_location_forecast(location_id: str):
         cleaned_data = clean_forecast_data(raw_data, location_id)
 
         async with get_db_session() as session:
-            logger.info(f"Loading {len(cleaned_data)} forecast records for {location_id}")
+            logger.info(
+                f"Loading {len(cleaned_data)} forecast records for {location_id}")
             await load_forecast_data(cleaned_data, session)
             await session.commit()
 
@@ -69,35 +70,33 @@ async def process_location_observation(location_id: str):
 
 async def process_all_locations():
     """Process both forecast and observation data for all locations."""
-    async with SessionLocal() as session:
-        async with session.begin():
-            try:
-                for location_id in LOCATIONS:
-                    logger.info(f"Processing location: {location_id}")
+    async with get_db_session() as session:
+        try:
+            for location_id in LOCATIONS:
+                logger.info(f"Processing location: {location_id}")
 
-                    # Process forecast
-                    raw_forecast = fetch_forecast_data(location_id)
-                    cleaned_forecast = clean_forecast_data(
-                        raw_forecast, location_id)
-                    await load_forecast_data(cleaned_forecast, session)
+                # Process forecast
+                raw_forecast = fetch_forecast_data(location_id)
+                cleaned_forecast = clean_forecast_data(
+                    raw_forecast, location_id)
+                await load_forecast_data(cleaned_forecast, session)
 
-                    # Process observation
-                    raw_observation = fetch_observation_data(location_id)
-                    cleaned_observation = clean_observation_data(
-                        raw_observation, location_id)
-                    await load_observation_data(cleaned_observation, session)
+                # Process observation
+                raw_observation = fetch_observation_data(location_id)
+                cleaned_observation = clean_observation_data(
+                    raw_observation, location_id)
+                await load_observation_data(cleaned_observation, session)
 
-                    logger.info(f"Completed processing for {location_id}")
+                logger.info(f"Completed processing for {location_id}")
 
-                # Explicitly commit the transaction
-                await session.commit()
-                logger.info("Successfully committed all changes to database")
+            await session.commit()
+            logger.info("Successfully committed all changes to database")
 
-            except Exception as e:
-                logger.error(f"Error in process_all_locations: {str(e)}")
-                await session.rollback()
-                logger.error("Rolling back all changes due to error")
-                raise
+        except Exception as e:
+            logger.error(f"Error in process_all_locations: {str(e)}")
+            await session.rollback()
+            logger.error("Rolling back all changes due to error")
+            raise
 
 
 def main():
