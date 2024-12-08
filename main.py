@@ -4,6 +4,7 @@ import requests
 import sys
 from datetime import datetime, timezone
 from core.settings import LOCATIONS
+from database.session import get_db_session
 from providers.nws.forecast import (
     fetch_forecast_data,
     clean_forecast_data,
@@ -66,19 +67,28 @@ async def process_location_observation(location_id: str):
 
 async def process_all_locations():
     """Process both forecast and observation data for all locations."""
-    try:
-        for location_id in LOCATIONS:
-            # Process forecast and observation in parallel
-            tasks = [
-                process_location_forecast(location_id),
-                process_location_observation(location_id)
-            ]
-            await asyncio.gather(*tasks)
-            logger.info(f"Completed processing for {location_id}")
+    async with get_db_session() as session:
+        try:
+            for location_id in LOCATIONS:
+                logger.info(f"Processing location: {location_id}")
 
-    except Exception as e:
-        logger.error(f"Error in process_all_locations: {str(e)}")
-        raise
+                # Process forecast
+                raw_forecast = fetch_forecast_data(location_id)
+                cleaned_forecast = clean_forecast_data(
+                    raw_forecast, location_id)
+                await load_forecast_data(cleaned_forecast, session)
+
+                # Process observation
+                raw_observation = fetch_observation_data(location_id)
+                cleaned_observation = clean_observation_data(
+                    raw_observation, location_id)
+                await load_observation_data(cleaned_observation, session)
+
+                logger.info(f"Completed processing for {location_id}")
+
+        except Exception as e:
+            logger.error(f"Error in process_all_locations: {str(e)}")
+            raise
 
 
 def main():

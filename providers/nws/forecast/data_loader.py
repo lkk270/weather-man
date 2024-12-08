@@ -4,6 +4,7 @@ from database import SessionLocal
 from database.models import WeatherForecast
 from contextlib import asynccontextmanager
 
+
 @asynccontextmanager
 async def get_db_session():
     async with SessionLocal() as session:
@@ -13,60 +14,50 @@ async def get_db_session():
             finally:
                 await session.close()
 
-async def load_forecast_data(data):
+
+async def load_forecast_data(data, session=None):
     if not data:
         return 0
 
-    async with get_db_session() as session:
-        # Get the location from the first record
-        location = data[0]["location"]
+    if session is None:
+        async with get_db_session() as session:
+            return await _load_forecast_data(data, session)
+    return await _load_forecast_data(data, session)
 
-        # Get the latest forecast time for this location
-        latest_forecast_query = (
-            select(WeatherForecast.forecast_time)
-            .where(WeatherForecast.location == location)
-            .order_by(desc(WeatherForecast.forecast_time))
-            .limit(1)
-        )
 
-        result = await session.execute(latest_forecast_query)
-        latest_time = result.scalar()
+async def _load_forecast_data(data, session):
+    location = data[0]["location"]
 
-        # Filter out any forecasts that are older than or equal to our latest record
-        new_records = []
-        if latest_time:
-            print(
-                f"Latest forecast in DB for {location} was at: {latest_time}")
-            new_records = [
-                record for record in data
-                if record["forecast_time"] > latest_time
-            ]
-        else:
-            print(
-                f"No existing forecasts found for {location}, will load all records")
-            new_records = data
+    latest_forecast_query = (
+        select(WeatherForecast.forecast_time)
+        .where(WeatherForecast.location == location)
+        .order_by(desc(WeatherForecast.forecast_time))
+        .limit(1)
+    )
 
-        if not new_records:
-            print("No new forecasts to load")
-            return 0
+    result = await session.execute(latest_forecast_query)
+    latest_time = result.scalar()
 
+    new_records = []
+    if latest_time:
+        print(f"Latest forecast in DB for {location} was at: {latest_time}")
+        new_records = [
+            record for record in data
+            if record["forecast_time"] > latest_time
+        ]
+    else:
         print(
-            f"Found {len(new_records)} new forecasts to load for {location}")
+            f"No existing forecasts found for {location}, will load all records")
+        new_records = data
 
-        # Add all new records within the same transaction
-        for record in new_records:
-            forecast = WeatherForecast(
-                location=record["location"],
-                temperature=record["temperature"],
-                relative_humidity=record["relative_humidity"],
-                wind_speed=record["wind_speed"],
-                dew_point=record["dew_point"],
-                is_daytime=record["is_daytime"],
-                short_forecast=record["short_forecast"],
-                forecast_time=record["forecast_time"],
-                probability_of_precipitation=record["probability_of_precipitation"],
-                created_at=func.now()
-            )
-            session.add(forecast)
+    if not new_records:
+        print("No new forecasts to load")
+        return 0
 
-        return len(new_records)
+    print(f"Found {len(new_records)} new forecasts to load for {location}")
+
+    for record in new_records:
+        forecast = WeatherForecast(**record)
+        session.add(forecast)
+
+    return len(new_records)

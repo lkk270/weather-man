@@ -31,17 +31,22 @@ def clean_observation_data(raw_data, location_id: str = "NYC"):
     cleaned_data = []
     for i in range(len(dates)):
         try:
+            # Skip record if essential fields are None
+            if temps[i] is None or humidities[i] is None or dew_points[i] is None:
+                print(f"Skipping observation {i+1} due to missing essential data")
+                continue
+
             dt = parser.parse(dates[i]).astimezone(timezone.utc)
 
             cleaned_record = {
                 "location": location_id,
                 "temperature": float(temps[i]),
                 "relative_humidity": float(humidities[i]),
-                "wind_speed": wind_speeds[i] if wind_speeds[i] is not None else None,
+                "wind_speed": float(wind_speeds[i]) if wind_speeds[i] is not None else None,
                 "dew_point": float(dew_points[i]),
-                "short_observation": summaries[i],
+                "short_observation": summaries[i] if summaries[i] is not None else "",
                 "observed_time": dt,
-                "my_temperature": None  # This will need to be populated from another source
+                "my_temperature": None
             }
             cleaned_data.append(cleaned_record)
 

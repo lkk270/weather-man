@@ -9,10 +9,10 @@ class WeatherObservation(Base):
     location = Column(String, nullable=False)
     temperature = Column(Float, nullable=False)
     my_temperature = Column(Float, nullable=True)
-    relative_humidity = Column(Float, nullable=False)
+    relative_humidity = Column(Float, nullable=True)
     wind_speed = Column(Float, nullable=True)
     dew_point = Column(Float, nullable=True)
-    short_observation = Column(String, nullable=False)
+    short_observation = Column(String, nullable=True)
     observed_time = Column(DateTime(timezone=True), nullable=False)
     created_at = Column(
         DateTime(timezone=True),
