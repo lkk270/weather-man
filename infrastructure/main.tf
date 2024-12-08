@@ -104,6 +104,10 @@ resource "aws_cloudwatch_event_target" "weather_pipeline_target" {
   rule      = aws_cloudwatch_event_rule.hourly.name
   target_id = "WeatherPipeline"
   arn       = aws_lambda_function.weather_pipeline.arn
+  
+  retry_policy {
+    maximum_retry_attempts = 0  # Disable retries
+  }
 }
 
 # Create CloudWatch Log Group with retention
