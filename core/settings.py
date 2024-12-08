@@ -18,14 +18,22 @@ class LocationConfig(NamedTuple):
 LOCATIONS: Dict[str, LocationConfig] = {
     "NYC": LocationConfig(
         name="New York City",
-        latitude=40.7128,
-        longitude=-74.0060,
+        latitude=40.78333,
+        longitude=-73.96667,
         station_id="KNYC",  # Central Park station
         grid_id="OKX",      # NWS grid ID for NYC
-        grid_x=33,          # NWS grid coordinates
-        grid_y=37
+        grid_x=34,          # NWS grid coordinates
+        grid_y=38
     ),
-    # Add more locations as needed
+    "MIA": LocationConfig(
+        name="Miami, Miami International Airport",
+        latitude=25.79056,
+        longitude=-80.31639,
+        station_id="KMIA",
+        grid_id="MFL",
+        grid_x=105,
+        grid_y=51
+    ),
 }
 
 NWS_FORECAST_BASE_URL = "https://api.weather.gov"

@@ -16,6 +16,7 @@ class WeatherForecast(Base):
     probability_of_precipitation = Column(Float, nullable=False)
     short_forecast = Column(String, nullable=False)
     forecast_time = Column(DateTime(timezone=True), nullable=False)
+    is_correct = Column(Boolean, nullable=False, server_default=text('false'))
     created_at = Column(
         DateTime(timezone=True),
         nullable=False,
