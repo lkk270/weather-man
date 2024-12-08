@@ -21,7 +21,9 @@ async def load_observation_data(data, session=None):
 
     if session is None:
         async with get_db_session() as session:
-            return await _load_observation_data(data, session)
+            records = await _load_observation_data(data, session)
+            await session.commit()
+            return records
     return await _load_observation_data(data, session)
 
 
