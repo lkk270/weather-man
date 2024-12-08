@@ -13,7 +13,8 @@ target_metadata = Base.metadata
 
 
 def clean_database_url(url):
-    # Keep using asyncpg, just remove ssl=require if present
+    # Convert asyncpg to psycopg2 for migrations
+    url = url.replace("postgresql+asyncpg://", "postgresql://")
     url = re.sub(r"\?ssl=require", "", url)
     return url
 
@@ -37,7 +38,8 @@ def run_migrations_online():
         configuration,
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
-        connect_args={"sslmode": "require"}  # Add SSL mode here
+        connect_args={
+            "sslmode": "require"} if "amazonaws.com" in DATABASE_URL else {}
     )
 
     with connectable.connect() as connection:

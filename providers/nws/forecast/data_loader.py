@@ -21,7 +21,8 @@ async def load_forecast_data(data):
                     is_daytime=record["is_daytime"],
                     short_forecast=record["short_forecast"],
                     forecast_time=record["forecast_time"],
-                    probability_of_precipitation=record["probability_of_precipitation"]
+                    probability_of_precipitation=record["probability_of_precipitation"],
+                    created_at=func.now()
                 )
                 session.add(forecast)
 
