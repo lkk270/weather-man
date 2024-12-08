@@ -88,8 +88,14 @@ async def process_all_locations():
 
                     logger.info(f"Completed processing for {location_id}")
 
+                # Explicitly commit the transaction
+                await session.commit()
+                logger.info("Successfully committed all changes to database")
+
             except Exception as e:
                 logger.error(f"Error in process_all_locations: {str(e)}")
+                await session.rollback()
+                logger.error("Rolling back all changes due to error")
                 raise
 
 
