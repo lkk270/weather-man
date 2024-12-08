@@ -36,9 +36,10 @@ async def process_location_forecast(location_id: str):
         logger.info(f"Cleaning forecast data for {location_id}")
         cleaned_data = clean_forecast_data(raw_data, location_id)
 
-        logger.info(
-            f"Loading {len(cleaned_data)} forecast records for {location_id}")
-        await load_forecast_data(cleaned_data)
+        async with get_db_session() as session:
+            logger.info(f"Loading {len(cleaned_data)} forecast records for {location_id}")
+            await load_forecast_data(cleaned_data, session)
+            await session.commit()
 
         logger.info(f"Successfully processed forecast data for {location_id}")
     except Exception as e:
