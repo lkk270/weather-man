@@ -63,7 +63,6 @@ pip install -r requirements.prod.txt -t package/
 cp -r src/ package/
 zip -r deployment_package.zip package/
 ```
-
 4. **Deploy Infrastructure**:
 
 ```bash
