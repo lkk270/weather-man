@@ -14,6 +14,8 @@ from providers.nws.observation import (
     clean_observation_data,
     load_observation_data
 )
+from alembic import command
+from alembic.config import Config
 
 # Configure logging
 logging.basicConfig(
@@ -100,6 +102,11 @@ def lambda_handler(event, context):
     logger.info(f"Event data: {event}")
 
     try:
+        # Run migrations first
+        alembic_cfg = Config("alembic.ini")
+        command.upgrade(alembic_cfg, "head")
+
+        # Then run the main process
         main()
         return {
             'statusCode': 200,

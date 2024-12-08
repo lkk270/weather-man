@@ -44,7 +44,7 @@ jobs:
             -r requirements.prod.txt
           ls -l ./package/requests*  # Verify that requests is installed
           rm -rf package/*.dist-info package/*.pth
-          cp -r core database providers main.py ./package/
+          cp -r core database providers migrations main.py alembic.ini ./package/
           cd package && zip -r ../deployment_package.zip . -x "*.pyc" "*.pyo" "test*" "tests*" "*__pycache__*"
           ls -lh ../deployment_package.zip
 
