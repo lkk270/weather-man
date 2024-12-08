@@ -102,23 +102,20 @@ def main():
         raise
 
 
-def lambda_handler(event, context):
+async def lambda_handler(event, context):
     """AWS Lambda entry point."""
     logger.info(f"Lambda triggered at {datetime.now(timezone.utc)}")
     logger.info(f"Event data: {event}")
 
-    # Run migrations first, outside of the main try-catch
     try:
+        # Run migrations first
         alembic_cfg = Config("alembic.ini")
         command.upgrade(alembic_cfg, "head")
         logger.info("Database migrations completed successfully")
-    except Exception as e:
-        logger.error(f"Migration failed: {str(e)}")
-        raise
 
-    # Then proceed with the main process
-    try:
-        main()
+        # Process locations
+        await process_all_locations()
+        
         return {
             'statusCode': 200,
             'body': 'Weather pipeline completed successfully'

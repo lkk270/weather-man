@@ -2,17 +2,7 @@ from datetime import datetime, timezone
 from sqlalchemy import func, select, desc
 from database import SessionLocal
 from database.models import WeatherForecast
-from contextlib import asynccontextmanager
-
-
-@asynccontextmanager
-async def get_db_session():
-    async with SessionLocal() as session:
-        async with session.begin():
-            try:
-                yield session
-            finally:
-                await session.close()
+from database.session import get_db_session
 
 
 async def load_forecast_data(data, session=None):
@@ -46,8 +36,7 @@ async def _load_forecast_data(data, session):
             if record["forecast_time"] > latest_time
         ]
     else:
-        print(
-            f"No existing forecasts found for {location}, will load all records")
+        print(f"No existing forecasts found for {location}, will load all records")
         new_records = data
 
     if not new_records:
