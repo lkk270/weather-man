@@ -16,24 +16,24 @@ class LocationConfig(NamedTuple):
 
 
 LOCATIONS: Dict[str, LocationConfig] = {
-    # "NYC_CASTLE_1": LocationConfig(
-    #     name="New York City",
-    #     latitude=40.78333,
-    #     longitude=-73.96667,
-    #     station_id="KNYC",  # Central Park station
-    #     grid_id="OKX",      # NWS grid ID for NYC
-    #     grid_x=34,          # NWS grid coordinates
-    #     grid_y=38
-    # ),
-    # "NYC_CASTLE_2": LocationConfig(
-    #     name="New York City",
-    #     latitude=40.7816,
-    #     longitude=-73.9505,
-    #     station_id="KNYC",
-    #     grid_id="OKX",
-    #     grid_x=35,
-    #     grid_y=38
-    # ),
+    "NYC_CASTLE_1": LocationConfig(
+        name="New York City",
+        latitude=40.78333,
+        longitude=-73.96667,
+        station_id="KNYC",  # Central Park station
+        grid_id="OKX",      # NWS grid ID for NYC
+        grid_x=34,          # NWS grid coordinates
+        grid_y=38
+    ),
+    "NYC_CASTLE_2": LocationConfig(
+        name="New York City",
+        latitude=40.7816,
+        longitude=-73.9505,
+        station_id="KNYC",
+        grid_id="OKX",
+        grid_x=35,
+        grid_y=38
+    ),
     "MIA": LocationConfig(
         name="Miami, Miami International Airport",
         latitude=25.79056,

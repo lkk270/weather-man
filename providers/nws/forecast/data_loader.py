@@ -11,9 +11,7 @@ async def load_forecast_data(data, session=None):
 
     if session is None:
         async with get_db_session() as session:
-            records = await _load_forecast_data(data, session)
-            await session.commit()
-            return records
+            return await _load_forecast_data(data, session)
     return await _load_forecast_data(data, session)
 
 
