@@ -4,6 +4,9 @@ from typing import AsyncGenerator
 from database import SessionLocal
 import logging
 
+# Configure SQLAlchemy engine logging
+logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
+logging.getLogger('sqlalchemy.pool').setLevel(logging.DEBUG)
 
 @asynccontextmanager
 async def get_db_session() -> AsyncGenerator[AsyncSession, None]:
