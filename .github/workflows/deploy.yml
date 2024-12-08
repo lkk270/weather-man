@@ -84,9 +84,3 @@ jobs:
         run: |
           cd infrastructure
           terraform apply -auto-approve tfplan
-
-      - name: Terraform Apply
-        if: env.apply_plan == 'true'
-        run: |
-          cd infrastructure
-          terraform apply -auto-approve tfplan
