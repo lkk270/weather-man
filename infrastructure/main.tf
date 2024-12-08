@@ -85,11 +85,12 @@ resource "aws_lambda_permission" "allow_eventbridge" {
   source_arn    = aws_cloudwatch_event_rule.hourly.arn
 }
 
-# Create CloudWatch Event rule (temporarily running every 5 minutes for testing)
+# Create CloudWatch Event rule (runs at the start of every hour)
 resource "aws_cloudwatch_event_rule" "hourly" {
   name                = "hourly-weather-pipeline-${terraform.workspace}"
-  description         = "Triggers weather pipeline hourly (currently every 5 min for testing)"
-  schedule_expression = "rate(5 minutes)"  # Temporary testing schedule
+  description         = "Triggers weather pipeline at the start of every hour"
+  schedule_expression = "cron(*/5 * * * ? *)"  # Run every 5 minutes
+  is_enabled         = true  # Explicitly enable the rule
 
   tags = {
     Name        = "weather-pipeline-trigger"
