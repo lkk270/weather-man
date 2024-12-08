@@ -56,7 +56,9 @@ async def _load_observation_data(data, session):
 
     print(f"Found {len(new_records)} new observations to load for {location}")
 
+    current_time = datetime.now(timezone.utc)
     for record in new_records:
+        record['created_at'] = current_time
         observation = WeatherObservation(**record)
         session.add(observation)
 
