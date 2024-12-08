@@ -27,26 +27,41 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
 
-      - name: Cache pip packages
-        uses: actions/cache@v2
-        with:
-          path: ./package
-          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.prod.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
-
       - name: Create deployment package
         run: |
+          # Debug: Show what files we're about to package
+          echo "Current directory contents:"
+          ls -la
+
+          # Create fresh package directory
+          rm -rf package
           mkdir -p package
+
+          # Install dependencies
           pip install --no-cache-dir --platform manylinux2014_x86_64 --target ./package \
             --implementation cp --python-version 3.9 \
             --only-binary=:all: --upgrade --force-reinstall \
             -r requirements.prod.txt
-          ls -l ./package/requests*  # Verify that requests is installed
+
+          # Debug: Show installed packages
+          echo "Installed packages:"
+          ls -l ./package/
+
+          # Clean up unnecessary files
           rm -rf package/*.dist-info package/*.pth
+
+          # Copy source files
           cp -r core database providers migrations main.py alembic.ini ./package/
+
+          # Debug: Show what we're about to zip
+          echo "Files to be zipped:"
+          ls -la ./package/
+
+          # Create zip file
           cd package && zip -r ../deployment_package.zip . -x "*.pyc" "*.pyo" "test*" "tests*" "*__pycache__*"
-          ls -lh ../deployment_package.zip
+
+          # Debug: Show final zip size
+          cd .. && ls -lh deployment_package.zip
 
       - name: Terraform Init
         run: |
@@ -66,7 +81,7 @@ jobs:
             -var="database_url=${{ secrets.DATABASE_URL }}" \
             -var="nws_observation_api_token=${{ secrets.NWS_OBSERVATION_API_TOKEN }}" \
             -var="alert_email=${{ secrets.ALERT_EMAIL }}" \
-            -var="force_update_value=$(date '+%Y-%m-%dT%H:%M:%S')"
+            -var="force_update_value=$(date '+%Y-%m-%dT%H:%M:%S')-$(git rev-parse --short HEAD)"
         continue-on-error: true
 
       - name: Check Terraform Plan Exit Code

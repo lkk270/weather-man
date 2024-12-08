@@ -54,6 +54,9 @@ resource "aws_lambda_function" "weather_pipeline" {
   memory_size     = 256
   architectures   = ["x86_64"]
   package_type    = "Zip"
+  
+  # Force update when code changes
+  source_code_hash = filebase64sha256("../deployment_package.zip")
 
   environment {
     variables = {
