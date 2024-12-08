@@ -95,31 +95,29 @@ def main():
 
 
 def lambda_handler(event, context):
-    """AWS Lambda handler"""
+    """AWS Lambda entry point."""
+    logger.info(f"Lambda triggered at {datetime.now(timezone.utc)}")
+    logger.info(f"Event data: {event}")
+
+    # Run migrations first, outside of the main try-catch
     try:
-        # Create new event loop for this Lambda invocation
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
+        alembic_cfg = Config("alembic.ini")
+        command.upgrade(alembic_cfg, "head")
+        logger.info("Database migrations completed successfully")
+    except Exception as e:
+        logger.error(f"Migration failed: {str(e)}")
+        raise
 
-        # Run our async process
-        result = loop.run_until_complete(process_all_locations())
-
-        # Clean up
-        loop.close()
-
+    # Then proceed with the main process
+    try:
+        main()
         return {
             'statusCode': 200,
-            'body': 'Successfully processed weather data'
+            'body': 'Weather pipeline completed successfully'
         }
     except Exception as e:
-        logger.error(f"Error in lambda_handler: {str(e)}")
+        logger.error(f"Pipeline failed: {str(e)}")
         raise
-    finally:
-        # Ensure we always clean up the loop
-        try:
-            loop.close()
-        except:
-            pass
 
 
 if __name__ == "__main__":
