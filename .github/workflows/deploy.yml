@@ -62,15 +62,15 @@ jobs:
         id: terraform_plan
         run: |
           cd infrastructure
-          terraform plan -detailed-exitcode \
+          terraform plan -out=tfplan \
             -var="database_url=${{ secrets.DATABASE_URL }}" \
             -var="nws_observation_api_token=${{ secrets.NWS_OBSERVATION_API_TOKEN }}" \
             -var="alert_email=${{ secrets.ALERT_EMAIL }}" \
             -var="force_update_value=$(date '+%Y-%m-%dT%H:%M:%S')" > tf_plan.log 2>&1 || exit_code=$?
           cat tf_plan.log
+          echo "exit_code=$exit_code" >> $GITHUB_ENV
           if [ "$exit_code" -eq 2 ]; then
             echo "Terraform detected changes."
-            exit 0  # Treat as success
           elif [ "$exit_code" -ne 0 ]; then
             echo "Terraform plan failed!" >&2
             exit $exit_code
@@ -79,10 +79,7 @@ jobs:
           fi
 
       - name: Terraform Apply
-        if: steps.terraform_plan.outcome == 'success' && steps.terraform_plan.conclusion == 'success'
+        if: env.exit_code == '2'
         run: |
           cd infrastructure
-          terraform apply -auto-approve \
-            -var="database_url=${{ secrets.DATABASE_URL }}" \
-            -var="nws_observation_api_token=${{ secrets.NWS_OBSERVATION_API_TOKEN }}" \
-            -var="alert_email=${{ secrets.ALERT_EMAIL }}"
+          terraform apply -auto-approve tfplan
