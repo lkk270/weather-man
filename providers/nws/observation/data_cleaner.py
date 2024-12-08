@@ -22,7 +22,7 @@ def clean_observation_data(raw_data, location_id: str = "NYC"):
     dew_points = observations.get('dew_point_temperature_set_1', [])
     summaries = observations.get('weather_summary_set_1d', [])
 
-    if not all([dates, temps, humidities, wind_speeds, dew_points, summaries]):
+    if not all([dates, temps]):
         print("Error: Missing required observation data")
         return []
 
@@ -31,9 +31,9 @@ def clean_observation_data(raw_data, location_id: str = "NYC"):
     cleaned_data = []
     for i in range(len(dates)):
         try:
-            # Skip record if essential fields are None
-            if temps[i] is None or humidities[i] is None or dew_points[i] is None:
-                print(f"Skipping observation {i+1} due to missing essential data")
+            # Skip record only if temperature is None
+            if temps[i] is None:
+                print(f"Skipping observation {i+1} due to missing temperature")
                 continue
 
             dt = parser.parse(dates[i]).astimezone(timezone.utc)
@@ -41,9 +41,9 @@ def clean_observation_data(raw_data, location_id: str = "NYC"):
             cleaned_record = {
                 "location": location_id,
                 "temperature": float(temps[i]),
-                "relative_humidity": float(humidities[i]),
+                "relative_humidity": float(humidities[i]) if humidities[i] is not None else None,
                 "wind_speed": float(wind_speeds[i]) if wind_speeds[i] is not None else None,
-                "dew_point": float(dew_points[i]),
+                "dew_point": float(dew_points[i]) if dew_points[i] is not None else None,
                 "short_observation": summaries[i] if summaries[i] is not None else "",
                 "observed_time": dt,
                 "my_temperature": None
