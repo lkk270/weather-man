@@ -8,21 +8,24 @@ import logging
 logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
 logging.getLogger('sqlalchemy.pool').setLevel(logging.DEBUG)
 
+logger = logging.getLogger(__name__)
+
+
 @asynccontextmanager
 async def get_db_session() -> AsyncGenerator[AsyncSession, None]:
-    """Get a database session context manager with transaction."""
-    logger = logging.getLogger(__name__)
-    async with SessionLocal() as session:
-        async with session.begin():
-            try:
-                yield session
-            except Exception as e:
-                logger.error(f"Session error occurred: {str(e)}")
-                logger.error("Stack trace:", exc_info=True)
-                raise
-            finally:
-                logger.info("Closing database session")
-                await session.close()
+    """Get a database session context manager."""
+    session = SessionLocal()
+    try:
+        yield session
+        await session.commit()
+    except Exception as e:
+        logger.error(f"Session error occurred: {str(e)}")
+        logger.error("Stack trace:", exc_info=True)
+        await session.rollback()
+        raise
+    finally:
+        logger.info("Closing database session")
+        await session.close()
 
 
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
