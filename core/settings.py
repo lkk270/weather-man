@@ -16,6 +16,15 @@ class LocationConfig(NamedTuple):
 
 
 LOCATIONS: Dict[str, LocationConfig] = {
+    "DEN": LocationConfig(
+        name="Denver, Denver International Airport",
+        latitude=39.84658,
+        longitude=-104.65622,
+        station_id="KDEN",
+        grid_id="BOU",
+        grid_x=75,
+        grid_y=66
+    ),
     "NYC_CASTLE_1": LocationConfig(
         name="New York City",
         latitude=40.78333,
@@ -78,15 +87,6 @@ LOCATIONS: Dict[str, LocationConfig] = {
         grid_id="EWX",
         grid_x=158,
         grid_y=88
-    ),
-    "DEN": LocationConfig(
-        name="Denver, Denver International Airport",
-        latitude=39.84658,
-        longitude=-104.65622,
-        station_id="KDEN",
-        grid_id="BOU",
-        grid_x=75,
-        grid_y=66
     ),
 }
 
