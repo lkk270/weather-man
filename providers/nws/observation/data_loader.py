@@ -19,20 +19,27 @@ async def get_db_session():
 
 
 async def load_observation_data(data, session=None):
+    logger.info("[Transaction Debug] Starting load_observation_data")
     if not data:
+        logger.info("[Transaction Debug] No data provided")
         return 0
 
     if session is None:
+        logger.info(
+            "[Transaction Debug] No session provided, creating new session")
         async with get_db_session() as session:
             return await _load_observation_data(data, session)
+
+    logger.info("[Transaction Debug] Using provided session")
     return await _load_observation_data(data, session)
 
 
 async def _load_observation_data(data, session):
     try:
         location = data[0]["location"]
-        logger.info(f"Starting observation load for {location}")
-        
+        logger.info(
+            f"[Transaction Debug] Starting observation load for {location}")
+
         latest_observation_query = (
             select(WeatherObservation.observed_time)
             .where(WeatherObservation.location == location)
@@ -45,7 +52,8 @@ async def _load_observation_data(data, session):
 
         new_records = []
         if latest_time:
-            print(f"Latest observation in DB for {location} was at: {latest_time}")
+            print(
+                f"Latest observation in DB for {location} was at: {latest_time}")
             new_records = [
                 record for record in data
                 if record["observed_time"] > latest_time
@@ -59,7 +67,8 @@ async def _load_observation_data(data, session):
             print("No new observations to load")
             return 0
 
-        print(f"Found {len(new_records)} new observations to load for {location}")
+        print(
+            f"Found {len(new_records)} new observations to load for {location}")
 
         current_time = datetime.now(timezone.utc)
         for record in new_records:
@@ -68,9 +77,11 @@ async def _load_observation_data(data, session):
             session.add(observation)
 
         await session.flush()
-        logger.info(f"Successfully loaded {len(new_records)} records for {location}")
+        logger.info(
+            f"[Transaction Debug] Flush complete for {location}")
         return len(new_records)
     except Exception as e:
-        logger.error(f"Error in _load_observation_data: {str(e)}")
+        logger.error(
+            f"[Transaction Debug] Error in _load_observation_data: {str(e)}")
         logger.error("Stack trace:", exc_info=True)
         raise
