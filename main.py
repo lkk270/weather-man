@@ -35,36 +35,43 @@ async def process_all_locations():
             async with get_db_session() as session:
                 logger.info(
                     f"[Transaction Debug] Session created for {location_id}")
+                try:
+                    # Process forecast
+                    raw_forecast = fetch_forecast_data(location_id)
+                    cleaned_forecast = clean_forecast_data(
+                        raw_forecast, location_id)
+                    logger.info(
+                        f"[Transaction Debug] About to load forecast data for {location_id}")
+                    await load_forecast_data(cleaned_forecast, session)
+                    await session.flush()
+                    logger.info(
+                        f"[Transaction Debug] Forecast data loaded for {location_id}")
 
-                # Process forecast
-                raw_forecast = fetch_forecast_data(location_id)
-                cleaned_forecast = clean_forecast_data(
-                    raw_forecast, location_id)
-                logger.info(
-                    f"[Transaction Debug] About to load forecast data for {location_id}")
-                await load_forecast_data(cleaned_forecast, session)
-                await session.flush()
-                logger.info(
-                    f"[Transaction Debug] Forecast data loaded for {location_id}")
+                    # Process observation
+                    raw_observation = fetch_observation_data(location_id)
+                    cleaned_observation = clean_observation_data(
+                        raw_observation, location_id)
+                    logger.info(
+                        f"[Transaction Debug] About to load observation data for {location_id}")
+                    await load_observation_data(cleaned_observation, session)
+                    await session.flush()
+                    logger.info(
+                        f"[Transaction Debug] Observation data loaded for {location_id}")
 
-                # Process observation
-                raw_observation = fetch_observation_data(location_id)
-                cleaned_observation = clean_observation_data(
-                    raw_observation, location_id)
-                logger.info(
-                    f"[Transaction Debug] About to load observation data for {location_id}")
-                await load_observation_data(cleaned_observation, session)
-                await session.flush()
-                logger.info(
-                    f"[Transaction Debug] Observation data loaded for {location_id}")
+                except Exception as e:
+                    logger.error(
+                        f"[Transaction Debug] Inner transaction error for {location_id}: {str(e)}")
+                    logger.error(
+                        "Inner transaction stack trace:", exc_info=True)
+                    raise
 
                 logger.info(
                     f"[Transaction Debug] Transaction complete for {location_id}")
 
         except Exception as e:
             logger.error(
-                f"[Transaction Debug] Error processing {location_id}: {str(e)}")
-            logger.error("Stack trace:", exc_info=True)
+                f"[Transaction Debug] Outer session error for {location_id}: {str(e)}")
+            logger.error("Outer session stack trace:", exc_info=True)
             failed_locations.append(location_id)
 
     if failed_locations:

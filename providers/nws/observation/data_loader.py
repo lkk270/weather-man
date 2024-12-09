@@ -1,36 +1,17 @@
 import logging
 from datetime import datetime, timezone
 from sqlalchemy import func, select, desc
-from database import SessionLocal
 from database.models import WeatherObservation
-from contextlib import asynccontextmanager
 
 logger = logging.getLogger(__name__)
 
 
-@asynccontextmanager
-async def get_db_session():
-    async with SessionLocal() as session:
-        async with session.begin():
-            try:
-                yield session
-            finally:
-                await session.close()
-
-
-async def load_observation_data(data, session=None):
+async def load_observation_data(data, session):
     logger.info("[Transaction Debug] Starting load_observation_data")
     if not data:
         logger.info("[Transaction Debug] No data provided")
         return 0
 
-    if session is None:
-        logger.info(
-            "[Transaction Debug] No session provided, creating new session")
-        async with get_db_session() as session:
-            return await _load_observation_data(data, session)
-
-    logger.info("[Transaction Debug] Using provided session")
     return await _load_observation_data(data, session)
 
 
