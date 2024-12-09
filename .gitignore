@@ -10,3 +10,5 @@ commands.txt
 *.tfvars
 !*.tfvars.example
 tfplan
+
+.DS_Store
